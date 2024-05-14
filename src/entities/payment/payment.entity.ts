@@ -10,7 +10,7 @@ export class PaymentEntity {
     public readonly orderNumber: string,
     public readonly totalValue: number,
     public readonly createdAt: Date,
-    public readonly status?: string,
+    public readonly status: string,
     public readonly clientId?: string,
     public readonly clientDocument?: string,
     public readonly reason?: string
