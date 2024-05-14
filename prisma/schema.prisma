@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Payment {
+  id              String            @id
+  orderNumber     String            @unique
+  totalValue      Int
+  clientId        String?
+  clientDocument  String?
+  status          String
+  reason          String?
+  createdAt       DateTime
+  PaymentClient   PaymentClient?    @relation(fields: [paymentClientId], references: [id])
+  PaymentProducts PaymentProducts[]
+  paymentClientId String?           @unique
+
+  @@map("payments")
+}
+
+model PaymentProducts {
+  id          String   @id
+  payment     Payment  @relation(fields: [paymentId], references: [id])
+  paymentId   String
+  name        String
+  category    String
+  description String
+  price       Int
+  image       String?
+  createdAt   DateTime
+  updatedAt   DateTime
+  paymentsId  String
+
+  @@map("payment_products")
+}
+
+model PaymentClient {
+  id         String   @id
+  payment    Payment?
+  paymentId  String
+  identifier String
+  name       String
+  cpf        String
+  email      String
+  createdAt  DateTime
+  updatedAt  DateTime
+  paymentsId String
+
+  @@map("payment_client")
+}
+
+model Request {
+  id        String   @id
+  method    String
+  route     String
+  input     String   @db.Text
+  output    String   @db.Text
+  status    Int
+  createdAt DateTime
+  updatedAt DateTime
+
+  @@map("requests")
+}
+
+model PublishedMessages {
+  id        String   @id
+  queue     String
+  origin    String
+  message   String   @db.Text
+  createdAt DateTime
+
+  @@map("published_messages")
+}
