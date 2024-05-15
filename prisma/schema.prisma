@@ -40,7 +40,6 @@ model PaymentProducts {
   image       String?
   createdAt   DateTime
   updatedAt   DateTime
-  paymentsId  String
 
   @@map("payment_products")
 }

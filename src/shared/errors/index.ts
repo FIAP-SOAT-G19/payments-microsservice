@@ -20,3 +20,10 @@ export class ServerError extends Error {
     this.stack = error?.stack
   }
 }
+
+export class PaymentNotFoundError extends Error {
+  constructor () {
+    super('Payment not found error')
+    this.name = 'NotFoundError'
+  }
+}
