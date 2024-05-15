@@ -1,8 +1,8 @@
-import { PaymentEntity } from '@/entities/payment/payment.entity'
 import { CreatePaymentGatewayInput, CreatePaymentProductGatewayInterface } from './create-payment-product.gateway.interface'
 import { prismaClient } from '../prisma.client'
+import { DefaultGateway } from '../default.gateway.interface'
 
-export class CreatePaymentProductGateway implements CreatePaymentProductGatewayInterface {
+export class CreatePaymentProductGateway extends DefaultGateway implements CreatePaymentProductGatewayInterface {
   async createPaymentProduct (input: CreatePaymentGatewayInput): Promise<void> {
     await prismaClient.paymentProducts.create({
       data: {
@@ -17,23 +17,5 @@ export class CreatePaymentProductGateway implements CreatePaymentProductGatewayI
         updatedAt: input.updatedAt
       }
     })
-  }
-
-  async getPaymentById (paymentId: string): Promise<PaymentEntity | null> {
-    const payment = await prismaClient.payment.findFirst({ where: { id: paymentId } })
-    if (!payment) {
-      return null
-    }
-
-    return {
-      id: payment.id,
-      orderNumber: payment.orderNumber,
-      status: payment.status,
-      totalValue: payment.totalValue,
-      clientId: payment.clientId ?? undefined,
-      clientDocument: payment.clientDocument ?? undefined,
-      reason: payment.reason ?? undefined,
-      createdAt: payment.createdAt
-    }
   }
 }
