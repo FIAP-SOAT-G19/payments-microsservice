@@ -1,9 +1,9 @@
 export type CreatePaymentInput = {
-  id: string
+  id?: string
   orderNumber: string
   totalValue: number
   status: string
-  createdAt: Date
+  createdAt?: Date
   clientId?: string
   clientDocument?: string
   reason?: string

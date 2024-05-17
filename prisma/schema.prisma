@@ -54,7 +54,6 @@ model PaymentClient {
   email      String
   createdAt  DateTime
   updatedAt  DateTime
-  paymentsId String
 
   @@map("payment_client")
 }

@@ -12,6 +12,6 @@ export type CreatePaymentClientGatewayInput = {
 }
 
 export interface CreatePaymentClientGatewayInterface {
-  getPaymentById: (id: string) => Promise<PaymentEntity | null>
   createPaymentClient: (input: CreatePaymentClientGatewayInput) => Promise<void>
+  getPaymentById: (paymentId: string) => Promise<PaymentEntity | null>
 }
