@@ -17,14 +17,11 @@ model Payment {
   id              String            @id
   orderNumber     String            @unique
   totalValue      Int
-  clientId        String?
-  clientDocument  String?
   status          String
   reason          String?
   createdAt       DateTime
-  PaymentClient   PaymentClient?    @relation(fields: [paymentClientId], references: [id])
+  PaymentClient   PaymentClient[]
   PaymentProducts PaymentProducts[]
-  paymentClientId String?           @unique
 
   @@map("payments")
 }
@@ -46,7 +43,7 @@ model PaymentProducts {
 
 model PaymentClient {
   id         String   @id
-  payment    Payment?
+  payment    Payment? @relation(fields: [paymentId], references: [id])
   paymentId  String
   identifier String
   name       String
@@ -56,19 +53,6 @@ model PaymentClient {
   updatedAt  DateTime
 
   @@map("payment_client")
-}
-
-model Request {
-  id        String   @id
-  method    String
-  route     String
-  input     String   @db.Text
-  output    String   @db.Text
-  status    Int
-  createdAt DateTime
-  updatedAt DateTime
-
-  @@map("requests")
 }
 
 model PublishedMessages {

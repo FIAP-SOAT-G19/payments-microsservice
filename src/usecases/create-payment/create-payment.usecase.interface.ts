@@ -4,8 +4,6 @@ export type CreatePaymentInput = {
   totalValue: number
   status: string
   createdAt?: Date
-  clientId?: string
-  clientDocument?: string
   reason?: string
 }
 

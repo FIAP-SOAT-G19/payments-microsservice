@@ -13,7 +13,7 @@ export class CreatedOrderHandler {
   async execute (message: any): Promise<void> {
     const { orderNumber, totalValue, products, client } = message
 
-    const paymentId = await this.createPayment(orderNumber, totalValue, client?.id, client?.cpf)
+    const paymentId = await this.createPayment(orderNumber, totalValue)
 
     products.map(async (product: CreatePaymentProductInput) => {
       await this.createPaymentProducts(paymentId, product)
@@ -24,10 +24,10 @@ export class CreatedOrderHandler {
     }
   }
 
-  async createPayment (orderNumber: string, totalValue: number, clientId?: string, clientDocument?: string): Promise<string> {
+  async createPayment (orderNumber: string, totalValue: number): Promise<string> {
     const createPaymentGateway = new CreatePaymentGateway()
     const createPaymentUseCase = new CreatePaymentUseCase(createPaymentGateway)
-    const paymentId = await createPaymentUseCase.execute({ orderNumber, status: constants.PAYMENT_STATUS.WAITING, totalValue, clientId, clientDocument })
+    const paymentId = await createPaymentUseCase.execute({ orderNumber, status: constants.PAYMENT_STATUS.WAITING, totalValue })
     return paymentId
   }
 

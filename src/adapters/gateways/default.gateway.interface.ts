@@ -13,8 +13,6 @@ export class DefaultGateway {
       orderNumber: payment.orderNumber,
       status: payment.status,
       totalValue: payment.totalValue,
-      clientId: payment.clientId ?? undefined,
-      clientDocument: payment.clientDocument ?? undefined,
       reason: payment.reason ?? undefined,
       createdAt: payment.createdAt
     }
