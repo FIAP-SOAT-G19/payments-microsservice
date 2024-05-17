@@ -6,7 +6,7 @@
   "scripts": {
     "start": "npx prisma generate && npx prisma migrate deploy && node -r dotenv/config dist/main/index.js",
     "clean": "rimraf dist",
-    "build": "npm run clean && tsc -p tsconfig.build.json",
+    "build": "npm run clean && tsc -p tsconfig.json",
     "check": "npx npm-check -s -u",
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
@@ -61,7 +61,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@aws-sdk/client-sqs": "^3.556.0",
+    "@aws-sdk/client-sqs": "^3.577.0",
     "@prisma/client": "5.8.1",
     "cors": "2.8.5",
     "crypto-js": "^4.2.0",
