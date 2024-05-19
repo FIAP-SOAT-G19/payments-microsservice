@@ -8,7 +8,7 @@ import MockDate from 'mockdate'
 const gateway = mock<ProcessPaymentGatewayInterface>()
 const crypto = mock<CrypotInterface>()
 
-process.env.QUEUE_PRODUCE_ORDER = 'https://sqs.us-east-1.amazonaws.com/975049990702/produce_order.fifo'
+process.env.QUEUE_APROVED_PAYMENT = 'https://sqs.us-east-1.amazonaws.com/975049990702/approved_payment.fifo'
 process.env.QUEUE_UNAUTHORIZED_PAYMENT = 'https://sqs.us-east-1.amazonaws.com/975049990702/unauthorized_payment.fifo'
 
 describe('ProcessPaymentUseCase', () => {
@@ -130,7 +130,7 @@ describe('ProcessPaymentUseCase', () => {
 
     expect(gateway.sendMessageQueue).toHaveBeenCalledTimes(1)
     expect(gateway.sendMessageQueue).toHaveBeenCalledWith(
-      'https://sqs.us-east-1.amazonaws.com/975049990702/produce_order.fifo',
+      'https://sqs.us-east-1.amazonaws.com/975049990702/approved_payment.fifo',
       JSON.stringify({
         orderNumber: 'anyOrderNumber',
         totalValue: 3000,
@@ -193,7 +193,7 @@ describe('ProcessPaymentUseCase', () => {
     expect(gateway.createPublishedMessageLog).toHaveBeenCalledTimes(1)
     expect(gateway.createPublishedMessageLog).toHaveBeenCalledWith({
       id: 'anyUUID',
-      queue: 'https://sqs.us-east-1.amazonaws.com/975049990702/produce_order.fifo',
+      queue: 'https://sqs.us-east-1.amazonaws.com/975049990702/approved_payment.fifo',
       origin: 'ProcessPaymentUseCase',
       message: JSON.stringify({
         orderNumber: 'anyOrderNumber',
