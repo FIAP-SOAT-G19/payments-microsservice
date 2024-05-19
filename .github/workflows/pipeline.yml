@@ -55,7 +55,7 @@ jobs:
 
       - name: Set SECRETS
         run: |
-          kubectl delete secret payments-credentials
+          kubectl delete secret payments-credentials --ignore-not-found
           kubectl create secret generic payments-credentials --from-literal=AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY_ID }} --from-literal=AWS_SECRET_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Deploy to EKS
