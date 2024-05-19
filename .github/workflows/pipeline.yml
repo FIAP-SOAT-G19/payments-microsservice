@@ -49,14 +49,14 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
+      - name: Set KUBECONFIG
+        run: |
+          aws eks update-kubeconfig --region us-east-1 --name eks_cluster_tech_challenge
+
       - name: Set SECRETS
         run: |
           kubectl delete secret payments-credentials
           kubectl create secret generic payments-credentials --from-literal=AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY_ID }} --from-literal=AWS_SECRET_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - name: Set KUBECONFIG
-        run: |
-          aws eks update-kubeconfig --region us-east-1 --name eks_cluster_tech_challenge
-
       - name: Deploy to EKS
-        run: kubectl apply -f k8s/api-deployment.yaml --validate=false
+        run: kubectl apply -f k8s/api-payments-deployment.yaml --validate=false
