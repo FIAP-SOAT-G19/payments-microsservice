@@ -66,7 +66,7 @@ export class ProcessPaymentUseCase implements ProcessPaymentUseCaseInterface {
     let message = ''
 
     if (status === constants.PAYMENT_STATUS.APPROVED) {
-      queueName = process.env.QUEUE_PRODUCE_ORDER!
+      queueName = process.env.QUEUE_APROVED_PAYMENT!
       message = JSON.stringify({
         orderNumber,
         totalValue,
