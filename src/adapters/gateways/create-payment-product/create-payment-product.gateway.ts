@@ -11,6 +11,7 @@ export class CreatePaymentProductGateway extends DefaultGateway implements Creat
         category: input.category,
         description: input.description ?? '',
         price: input.price,
+        amount: input.amount,
         paymentId: input.paymentId,
         image: input.image,
         createdAt: input.createdAt,

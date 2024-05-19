@@ -16,6 +16,7 @@ describe('CreatePaymentUseCase', () => {
     input = {
       id: 'anyId',
       orderNumber: 'anyOrderNumber',
+      cardId: 'anyCardId',
       status: 'waiting',
       totalValue: 5000,
       createdAt: new Date()
@@ -25,6 +26,7 @@ describe('CreatePaymentUseCase', () => {
       id: 'AnyId',
       orderNumber: 'anyOrderNumber',
       totalValue: 5000,
+      cardId: 'anyCardId',
       createdAt: new Date(),
       status: 'waiting'
     })
@@ -55,6 +57,7 @@ describe('CreatePaymentUseCase', () => {
       id: 'AnyId',
       orderNumber: 'anyOrderNumber',
       totalValue: 5000,
+      cardId: 'anyCardId',
       createdAt: new Date(),
       status: 'waiting'
     })

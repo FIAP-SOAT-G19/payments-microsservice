@@ -7,7 +7,8 @@ export class CreatePaymentUseCase implements CreatePaymentUseCaseInterface {
   async execute (input: CreatePaymentInput): Promise<string> {
     const payment = PaymentEntity.build({
       orderNumber: input.orderNumber,
-      totalValue: input.totalValue
+      totalValue: input.totalValue,
+      cardId: input.cardId
     })
 
     await this.gateway.createPayment(payment)

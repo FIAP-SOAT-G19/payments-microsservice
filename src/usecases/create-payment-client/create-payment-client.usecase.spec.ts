@@ -28,6 +28,7 @@ describe('CreatePaymentClientUseCase', () => {
       id: 'AnyId',
       orderNumber: 'anyOrderNumber',
       totalValue: 5000,
+      cardId: 'anyCardId',
       createdAt: new Date(),
       status: 'waiting'
     })

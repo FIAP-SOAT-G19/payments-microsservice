@@ -9,6 +9,7 @@ export class PaymentEntity {
     public readonly id: string,
     public readonly orderNumber: string,
     public readonly totalValue: number,
+    public readonly cardId: string,
     public readonly createdAt: Date,
     public readonly status: string,
     public readonly reason?: string
@@ -24,19 +25,23 @@ export class PaymentEntity {
       throw new MissingParamError('orderNumber')
     }
 
+    if (!isValidString(input?.cardId)) {
+      throw new MissingParamError('cardId')
+    }
+
     if (!isValidNumber(input?.totalValue)) {
       throw new InvalidParamError('totalValue')
     }
   }
 
   private static create(input: BuildPaymentInput): PaymentEntity {
-    const { orderNumber, totalValue } = input
+    const { orderNumber, totalValue, cardId } = input
 
     const id = input.id ?? randomUUID()
     const createdAt = input.createdAt ?? new Date()
     const status = input.status ?? 'waiting'
     const reason = input.reason ?? undefined
 
-    return new PaymentEntity(id, orderNumber, totalValue, createdAt, status, reason)
+    return new PaymentEntity(id, orderNumber, totalValue, cardId, createdAt, status, reason)
   }
 }
