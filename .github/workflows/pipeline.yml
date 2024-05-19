@@ -3,8 +3,6 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    types: [opened, synchronize, reopened]
 jobs:
   sonarcloud:
     name: SonarCloud
@@ -50,6 +48,11 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
+
+      - name: Set SECRETS
+        run: |
+          kubectl delete secret payments-credentials
+          kubectl create secret generic payments-credentials --from-literal=AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY_ID }} --from-literal=AWS_SECRET_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Set KUBECONFIG
         run: |

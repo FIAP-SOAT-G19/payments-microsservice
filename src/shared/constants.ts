@@ -7,6 +7,6 @@ export default {
   },
   MESSAGE_GROUP_ID: 'processed_payment',
   CARD_ENCRYPTOR_MICROSSERVICE: {
-    URL: 'http://card_encryptor:3001/api/v1'
+    URL: process.env.CARD_ENCRYPTOR_MICROSSERVICE_URL!
   }
 }

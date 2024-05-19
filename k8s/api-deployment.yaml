@@ -1,30 +1,30 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: api-deployment
+  name: api-payments-deployment
 spec:
   selector:
     matchLabels:
-      app: api
+      app: api-payments
   template:
     metadata:
       labels:
-        app: api
+        app: api-payments
     spec:
       containers:
-        - name: api
+        - name: api-payments-deployment
           image: devrsilva/payments-microsservice
           resources:
             limits:
               memory: "512Mi"
               cpu: "500m"
           ports:
-            - containerPort: 3000
+            - containerPort: 3006
               protocol: TCP
           livenessProbe:
             httpGet:
               path: /
-              port: 3002
+              port: 3006
             initialDelaySeconds: 15
             periodSeconds: 10
             successThreshold: 1
@@ -33,7 +33,7 @@ spec:
           readinessProbe:
             httpGet:
               path: /
-              port: 3002
+              port: 3006
             initialDelaySeconds: 15
             periodSeconds: 10
             successThreshold: 1
@@ -43,28 +43,73 @@ spec:
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
-                  name: api-secrets
+                  name: api-payments-secrets
                   key: database-url
             - name: POSTGRES_HOST
               valueFrom:
                 secretKeyRef:
-                  name: api-secrets
+                  name: api-payments-secrets
                   key: postgres-host
             - name: POSTGRES_DB
               valueFrom:
                 secretKeyRef:
-                  name: api-secrets
+                  name: api-payments-secrets
                   key: postgres-db
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
-                  name: api-secrets
+                  name: api-payments-secrets
                   key: postgres-user
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: api-secrets
+                  name: api-payments-secrets
                   key: postgres-password
+            - name: PORT
+              valueFrom:
+                secretKeyRef:
+                  name: api-payments-secrets
+                  key: port
+            - name: AWS_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: payments-credentials
+                  key: AWS_ACCESS_KEY
+            - name: AWS_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: payments-credentials
+                  key: AWS_SECRET_KEY
+            - name: ENCRYPT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: api-payments-secrets
+                  key: encrypt-key
+            - name: APP_ID
+              valueFrom:
+                secretKeyRef:
+                  name: api-payments-secrets
+                  key: app-id
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: api-payments-secrets
+                  key: secret-key
+            - name: CREATED_ORDER_QUEUE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: api-payments-secrets
+                  key: created-order-queue-name
+            - name: QUEUE_APPROVED_PAYMENT
+              valueFrom:
+                secretKeyRef:
+                  name: api-payments-secrets
+                  key: queue-approved-payment
+            - name: QUEUE_UNAUTHORIZED_PAYMENT
+              valueFrom:
+                secretKeyRef:
+                  name: api-payments-secrets
+                  key: queue-unauthorized-payment
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -74,7 +119,7 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: api-deployment
+    name: api-payments-deployment
   minReplicas: 1
   maxReplicas: 10
   metrics:
@@ -88,25 +133,35 @@ spec:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: api-secrets
+  name: api-payments-secrets
 type: Opaque
 stringData:
-  postgres-db: products
+  postgres-db: payments
   postgres-user: postgres
   postgres-password: postgres
-  postgres-host: rds.amazonaws.com
-  database-url: postgresql://postgres:postgres@alterar:5432/products?schema=public
+  postgres-host: payments.czg2ea2yu0rz.us-east-1.rds.amazonaws.com
+  database-url: postgresql://postgres:postgres@payments.czg2ea2yu0rz.us-east-1.rds.amazonaws.com:5432/payments?schema=public
+  port: "3006"
+  app-id: payment_microsservice
+  secret-key: e6cd5db8d02df52e23eb590e59d43cdc
+  aws-region: us-east-1
+  encrypt-key: $2a$12$N8KpRrrBKBkFo3jYez.KTOA7nTvlwyuM0sVlzPVdCMhRQzdG0NYFi
+  card-encryptor-microsservice-url:
+  created-order-queue-name: https://sqs.us-east-1.amazonaws.com/975049990702/created_order.fifo
+  queue-approved-payment: https://sqs.us-east-1.amazonaws.com/975049990702/approved_payment.fifo
+  queue-unauthorized-payment: https://sqs.us-east-1.amazonaws.com/975049990702/unauthorized_payment.fifo
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: api-svc
+  name: api-payments-svc
 spec:
   selector:
-    app: api
+    app: api-payments
   ports:
     - protocol: TCP
-      port: 3002
-      targetPort: 3002
-      nodePort: 30002
+      port: 3006
+      targetPort: 3006
+      nodePort: 30006
   type: LoadBalancer
