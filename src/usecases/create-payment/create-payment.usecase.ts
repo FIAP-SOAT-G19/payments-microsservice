@@ -1,6 +1,6 @@
-import { PaymentEntity } from '@/entities/payment/payment.entity'
+import { PaymentEntity } from '../../entities/payment/payment.entity'
 import { CreatePaymentInput, CreatePaymentUseCaseInterface } from './create-payment.usecase.interface'
-import { CreatePaymenteGatewayInterface } from '@/adapters/gateways/create-payment/create-payment.gateway.interface'
+import { CreatePaymenteGatewayInterface } from '../../adapters/gateways/create-payment/create-payment.gateway.interface'
 
 export class CreatePaymentUseCase implements CreatePaymentUseCaseInterface {
   constructor(private readonly gateway: CreatePaymenteGatewayInterface) {}
