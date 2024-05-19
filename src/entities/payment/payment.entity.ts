@@ -1,7 +1,7 @@
-import { isValidString } from '@/shared/helpers/string.helper'
+import { isValidString } from '../../shared/helpers/string.helper'
 import { BuildPaymentInput } from './payment.types'
-import { InvalidParamError, MissingParamError } from '@/shared/errors'
-import { isValidNumber } from '@/shared/helpers/number.helper'
+import { InvalidParamError, MissingParamError } from '../../shared/errors'
+import { isValidNumber } from '../../shared/helpers/number.helper'
 import { randomUUID } from 'crypto'
 
 export class PaymentEntity {
