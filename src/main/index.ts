@@ -3,6 +3,7 @@ import express from 'express'
 import cors from 'cors'
 import { logger } from '@/shared/helpers/logger.helper'
 import { processMessagesOnQueue } from '@/adapters/queue/aws-sqs-poller.adapter'
+import { processPayments } from './process-payment.bot'
 
 const start = async (): Promise<void> => {
   const app = express()
@@ -14,7 +15,8 @@ const start = async (): Promise<void> => {
 
   app.listen(port, () => { logger.info(`Server running at port ${port}`) })
 
-  await processMessagesOnQueue()
+  await processPayments()
+  await processMessagesOnQueue() // Essa chamada tem que ser a ultima sempre
 }
 
 void start()

@@ -1,7 +1,7 @@
 import { CreatePaymentClientGateway } from '@/adapters/gateways/create-payment-client/create-payment-client.gateway'
 import { CreatePaymentProductGateway } from '@/adapters/gateways/create-payment-product/create-payment-product.gateway'
 import { CreatePaymentGateway } from '@/adapters/gateways/create-payment/create-payment.gateway'
-import { Cryptodapter } from '@/adapters/tools/crypto/crypto.adapter'
+import { CryptoAdapter } from '@/adapters/tools/crypto/crypto.adapter'
 import { CreatePaymentClientUseCase } from '@/usecases/create-payment-client/create-payment-client.usecase'
 import { CreatePaymentClientInput } from '@/usecases/create-payment-client/create-payment-client.usecase.interface'
 import { CreatePaymentProductUseCase } from '@/usecases/create-payment-product/create-payment-product.usecase'
@@ -11,9 +11,9 @@ import constants from '@/shared/constants'
 
 export class CreatedOrderHandler {
   async execute (message: any): Promise<void> {
-    const { orderNumber, totalValue, products, client } = message
+    const { orderNumber, totalValue, products, client, cardIdentifier } = message
 
-    const paymentId = await this.createPayment(orderNumber, totalValue, client?.id, client?.cpf)
+    const paymentId = await this.createPayment(orderNumber, totalValue, cardIdentifier)
 
     products.map(async (product: CreatePaymentProductInput) => {
       await this.createPaymentProducts(paymentId, product)
@@ -24,16 +24,16 @@ export class CreatedOrderHandler {
     }
   }
 
-  async createPayment (orderNumber: string, totalValue: number, clientId?: string, clientDocument?: string): Promise<string> {
+  async createPayment (orderNumber: string, totalValue: number, cardId: string): Promise<string> {
     const createPaymentGateway = new CreatePaymentGateway()
     const createPaymentUseCase = new CreatePaymentUseCase(createPaymentGateway)
-    const paymentId = await createPaymentUseCase.execute({ orderNumber, status: constants.PAYMENT_STATUS.WAITING, totalValue, clientId, clientDocument })
+    const paymentId = await createPaymentUseCase.execute({ orderNumber, status: constants.PAYMENT_STATUS.WAITING, totalValue, cardId })
     return paymentId
   }
 
   async createPaymentProducts (paymentId: string, product: CreatePaymentProductInput): Promise<void> {
     const createPaymentProductGateway = new CreatePaymentProductGateway()
-    const crypto = new Cryptodapter()
+    const crypto = new CryptoAdapter()
     const createPaymentProductUseCase = new CreatePaymentProductUseCase(createPaymentProductGateway, crypto)
     await createPaymentProductUseCase.execute({
       paymentId,
@@ -41,6 +41,7 @@ export class CreatedOrderHandler {
       category: product.category,
       description: product.description,
       price: product.price,
+      amount: product.amount,
       createdAt: product.createdAt,
       updatedAt: product.updatedAt
     })
@@ -48,7 +49,7 @@ export class CreatedOrderHandler {
 
   async createPaymentClient (paymentId: string, client: CreatePaymentClientInput): Promise<void> {
     const createPaymentClientGateway = new CreatePaymentClientGateway()
-    const crypto = new Cryptodapter()
+    const crypto = new CryptoAdapter()
     const createPaymentClientUseCase = new CreatePaymentClientUseCase(createPaymentClientGateway, crypto)
     await createPaymentClientUseCase.execute({
       identifier: client.identifier,
