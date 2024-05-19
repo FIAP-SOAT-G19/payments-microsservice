@@ -22,7 +22,8 @@ export class ProcessPaymentGateway implements ProcessPaymentGatewayInterface {
             name: true,
             category: true,
             description: true,
-            price: true
+            price: true,
+            amount: true
           }
         },
         PaymentClient: {
@@ -89,19 +90,24 @@ export class ProcessPaymentGateway implements ProcessPaymentGatewayInterface {
     return response
   }
 
+  async deleteCardData (cardId: string): Promise<void> {
+    const http = new NodeFetchAdapter()
+
+    const url = `${constants.CARD_ENCRYPTOR_MICROSSERVICE.URL}/card/${cardId}`
+    const headers = {
+      'Content-Type': 'application/json',
+      appid: process.env.APP_ID,
+      secretkey: process.env.SECRET_KEY
+    }
+
+    await http.delete(url, headers)
+  }
+
   async processExternalPayment (creditCard: CreditCard, totalValue: number): Promise<ProcessPaymentOutput> {
     const isEvenNumber = (+creditCard.number.slice(-1)) % 2 === 0
 
-    let status
-    let reason
-
-    if (isEvenNumber) {
-      status = 'approved'
-      reason = undefined
-    } else {
-      status = 'refused'
-      reason = this.getRandomMessage()
-    }
+    const status = isEvenNumber ? 'approved' : 'refused'
+    const reason = isEvenNumber ? undefined : this.getRandomMessage()
 
     return { status, reason }
   }

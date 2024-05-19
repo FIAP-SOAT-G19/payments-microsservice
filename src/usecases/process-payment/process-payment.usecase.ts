@@ -28,7 +28,7 @@ export class ProcessPaymentUseCase implements ProcessPaymentUseCaseInterface {
   }
 
   async handleCard (cardId: string): Promise<CreditCard> {
-    logger.info(`Send request to card_encryptor microsservice\n cardId: ${cardId}`)
+    logger.info(`Send request to card_encryptor microsservice\n cardId: ${cardId} [GET]`)
 
     let cardEncrypted = null
 
@@ -58,7 +58,7 @@ export class ProcessPaymentUseCase implements ProcessPaymentUseCaseInterface {
 
   async handleResponse (response: ProcessPaymentOutput, payment: PaymentOutput): Promise<void> {
     const { status, reason } = response
-    const { orderNumber, totalValue, cardId: cardIdentifier, id } = payment.payment
+    const { orderNumber, totalValue, cardId: cardIdentifier, id, cardId } = payment.payment
     const messageDeduplicationId = orderNumber
     const messageGroupId = constants.MESSAGE_GROUP_ID
 
@@ -66,7 +66,7 @@ export class ProcessPaymentUseCase implements ProcessPaymentUseCaseInterface {
     let message = ''
 
     if (status === constants.PAYMENT_STATUS.APPROVED) {
-      queueName = process.env.QUEUE_APPROVED_PAYMENT!
+      queueName = process.env.QUEUE_PRODUCE_ORDER!
       message = JSON.stringify({
         orderNumber,
         totalValue,
@@ -76,10 +76,11 @@ export class ProcessPaymentUseCase implements ProcessPaymentUseCaseInterface {
       })
     } else {
       queueName = process.env.QUEUE_UNAUTHORIZED_PAYMENT!
-      message = JSON.stringify({ status, reason })
+      message = JSON.stringify({ status: 'canceled', reason, orderNumber })
     }
 
     const success = await this.gateway.sendMessageQueue(queueName, message, messageGroupId, messageDeduplicationId)
+    logger.info(`Publishing message on queue\nQueueName: ${queueName}\nMessage: ${message}`)
 
     if (!success) {
       throw new Error('Error sending message queue')
@@ -94,5 +95,13 @@ export class ProcessPaymentUseCase implements ProcessPaymentUseCaseInterface {
     })
 
     await this.gateway.updatePaymentStatus(id, status)
+
+    try {
+      logger.info(`Send request to card_encryptor microsservice\n cardId: ${cardId} [DELETE]`)
+      await this.gateway.deleteCardData(cardId)
+    } catch (error) {
+      logger.error(`Error delete cardData\n ${error}`)
+      throw error
+    }
   }
 }

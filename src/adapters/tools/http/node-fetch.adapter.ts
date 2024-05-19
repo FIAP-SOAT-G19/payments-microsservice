@@ -29,4 +29,16 @@ export class NodeFetchAdapter implements HttpRequest {
       throw error
     }
   }
+
+  async delete (url: string, headers: any): Promise<any> {
+    try {
+      await fetch(url, {
+        method: 'DELETE',
+        headers
+      })
+    } catch (error) {
+      console.log(error)
+      throw error
+    }
+  }
 }
