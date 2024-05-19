@@ -1,15 +1,15 @@
-import { Cryptodapter } from './crypto.adapter'
+import { CryptoAdapter } from './crypto.adapter'
 import { randomUUID } from 'crypto'
 
 jest.mock('crypto', () => ({
   randomUUID: jest.fn().mockReturnValue('anyUUID')
 }))
 
-describe('Cryptodapter', () => {
-  let sut: Cryptodapter
+describe('CryptoAdapter', () => {
+  let sut: CryptoAdapter
 
   beforeAll(() => {
-    sut = new Cryptodapter()
+    sut = new CryptoAdapter()
   })
   test('should call randomUUID once', () => {
     sut.generateUUID()

@@ -15,6 +15,7 @@ describe('PaymentEntity', () => {
     input = {
       orderNumber: 'anyOrderNumber',
       totalValue: 5000,
+      cardId: 'anyCardId',
       products: [{
         id: 'anyProductId',
         category: 'anyCategory',
@@ -57,6 +58,7 @@ describe('PaymentEntity', () => {
       id: 'AnyId',
       orderNumber: 'anyOrderNumber',
       totalValue: 5000,
+      cardId: 'anyCardId',
       createdAt: new Date(),
       status: 'waiting'
     })

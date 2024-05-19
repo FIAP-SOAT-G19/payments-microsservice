@@ -7,6 +7,7 @@ export type CreatePaymentGatewayInput = {
   category: string
   description?: string
   price: number
+  amount: number
   image?: string
   createdAt: Date
   updatedAt: Date

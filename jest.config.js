@@ -12,6 +12,8 @@ module.exports = {
     '!<rootDir>/src/**/module-alias.ts',
     '!<rootDir>/src/**/routes.ts',
     '!<rootDir>/src/**/prisma.client.ts',
+    '!<rootDir>/src/main/**',
+    '!<rootDir>/src/adapters/queue/handlers/**',
   ],
   coverageDirectory: 'coverage',
   coverageProvider: 'babel',

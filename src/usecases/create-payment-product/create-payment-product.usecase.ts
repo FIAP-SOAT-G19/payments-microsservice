@@ -19,7 +19,7 @@ export class CreatePaymentProductUseCase implements CreatePaymentProductUseCaseI
   }
 
   async validate (input: CreatePaymentProductInput): Promise<void> {
-    const requiredFields: Array<keyof Omit<CreatePaymentProductInput, 'description' | 'createdAt' | 'updatedAt' | 'image' | 'price'>> = ['paymentId', 'name', 'category']
+    const requiredFields: Array<keyof Omit<CreatePaymentProductInput, 'description' | 'createdAt' | 'updatedAt' | 'image' | 'price' | 'amount'>> = ['paymentId', 'name', 'category']
 
     requiredFields.forEach(field => {
       if (!isValidString(input[field])) {

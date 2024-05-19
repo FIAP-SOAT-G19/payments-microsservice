@@ -1,7 +1,7 @@
-import { isValidString } from '@/shared/helpers/string.helper'
+import { isValidString } from '../../shared/helpers/string.helper'
 import { BuildPaymentInput } from './payment.types'
-import { InvalidParamError, MissingParamError } from '@/shared/errors'
-import { isValidNumber } from '@/shared/helpers/number.helper'
+import { InvalidParamError, MissingParamError } from '../../shared/errors'
+import { isValidNumber } from '../../shared/helpers/number.helper'
 import { randomUUID } from 'crypto'
 
 export class PaymentEntity {
@@ -9,10 +9,9 @@ export class PaymentEntity {
     public readonly id: string,
     public readonly orderNumber: string,
     public readonly totalValue: number,
+    public readonly cardId: string,
     public readonly createdAt: Date,
     public readonly status: string,
-    public readonly clientId?: string,
-    public readonly clientDocument?: string,
     public readonly reason?: string
   ) {}
 
@@ -26,21 +25,23 @@ export class PaymentEntity {
       throw new MissingParamError('orderNumber')
     }
 
+    if (!isValidString(input?.cardId)) {
+      throw new MissingParamError('cardId')
+    }
+
     if (!isValidNumber(input?.totalValue)) {
       throw new InvalidParamError('totalValue')
     }
   }
 
   private static create(input: BuildPaymentInput): PaymentEntity {
-    const { orderNumber, totalValue } = input
+    const { orderNumber, totalValue, cardId } = input
 
     const id = input.id ?? randomUUID()
     const createdAt = input.createdAt ?? new Date()
     const status = input.status ?? 'waiting'
-    const clientId = input.clientId ?? undefined
-    const clientDocument = input.clientDocument ?? undefined
     const reason = input.reason ?? undefined
 
-    return new PaymentEntity(id, orderNumber, totalValue, createdAt, status, clientId, clientDocument, reason)
+    return new PaymentEntity(id, orderNumber, totalValue, cardId, createdAt, status, reason)
   }
 }
