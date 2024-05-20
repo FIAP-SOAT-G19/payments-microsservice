@@ -87,7 +87,7 @@ export class ProcessPaymentGateway implements ProcessPaymentGatewayInterface {
     }
 
     const response = await http.get(url, headers)
-    return response
+    return response.json()
   }
 
   async deleteCardData (cardId: string): Promise<void> {
