@@ -20,7 +20,7 @@ export class ProcessPaymentUseCase implements ProcessPaymentUseCaseInterface {
     for await (const payment of payments) {
       await this.gateway.updatePaymentStatus(payment.payment.id, constants.PAYMENT_STATUS.PROCESSING)
 
-      const creditCard = await this.handleCard(payment.payment.cardId)
+      const creditCard = this.getRandomCreditCard()
       const response = await this.gateway.processExternalPayment(creditCard, payment.payment.totalValue)
 
       await this.handleResponse(response, payment)
@@ -103,5 +103,42 @@ export class ProcessPaymentUseCase implements ProcessPaymentUseCaseInterface {
       logger.error(`Error delete cardData\n ${error}`)
       throw error
     }
+  }
+
+  getRandomCreditCard(): CreditCard {
+    const cards = [
+      {
+        brand: 'master',
+        number: '5170578203887557',
+        cvv: '123',
+        expiryMonth: '05',
+        expiryYear: '2025'
+      },
+      {
+        brand: 'visa',
+        number: '4716059500917722',
+        cvv: '321',
+        expiryMonth: '12',
+        expiryYear: '2026'
+      },
+      {
+        brand: 'elo',
+        number: '4716059500917721',
+        cvv: '321',
+        expiryMonth: '12',
+        expiryYear: '2030'
+      },
+      {
+        brand: 'visa',
+        number: '4716059500917729',
+        cvv: '321',
+        expiryMonth: '11',
+        expiryYear: '2050'
+      }
+    ]
+
+    const randomIndex = Math.floor(Math.random() * cards.length)
+
+    return cards[randomIndex]
   }
 }
