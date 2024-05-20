@@ -3,7 +3,7 @@ import { HttpRequest } from './http-request.interface'
 export class NodeFetchAdapter implements HttpRequest {
   async post (url: string, headers: any, data: any): Promise<any> {
     try {
-      const response = await fetch('http://'+url, {
+      const response = await fetch(url, {
         method: 'POST',
         body: JSON.stringify(data),
         headers
@@ -18,11 +18,11 @@ export class NodeFetchAdapter implements HttpRequest {
 
   async get (url: string, headers: any): Promise<any> {
     try {
-      const response = await fetch('https://'+url, {
+      const response = await fetch(url, {
         method: 'GET',
         headers
       })
-      console.log(response)
+      console.log(response.text())
 
       return response.json()
     } catch (error) {
