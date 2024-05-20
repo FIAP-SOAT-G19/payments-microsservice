@@ -22,7 +22,6 @@ export class NodeFetchAdapter implements HttpRequest {
         method: 'GET',
         headers
       })
-      console.log(response)
 
       return response.json()
     } catch (error) {

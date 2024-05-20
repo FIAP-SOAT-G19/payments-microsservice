@@ -38,7 +38,6 @@ export class ProcessPaymentUseCase implements ProcessPaymentUseCaseInterface {
       logger.error(`Error get cardData\n ${error}`)
       throw error
     }
-    console.log(cardEncrypted)
 
     let cardDecrypted = null
 
@@ -67,7 +66,7 @@ export class ProcessPaymentUseCase implements ProcessPaymentUseCaseInterface {
     let message = ''
 
     if (status === constants.PAYMENT_STATUS.APPROVED) {
-      queueName = process.env.QUEUE_APROVED_PAYMENT!
+      queueName = process.env.QUEUE_APPROVED_PAYMENT!
       message = JSON.stringify({
         orderNumber,
         totalValue,
@@ -110,7 +109,7 @@ export class ProcessPaymentUseCase implements ProcessPaymentUseCaseInterface {
     const cards = [
       {
         brand: 'master',
-        number: '5170578203887557',
+        number: '5170578203887556',
         cvv: '123',
         expiryMonth: '05',
         expiryYear: '2025'
@@ -124,14 +123,14 @@ export class ProcessPaymentUseCase implements ProcessPaymentUseCaseInterface {
       },
       {
         brand: 'elo',
-        number: '4716059500917721',
+        number: '4716059500917723',
         cvv: '321',
         expiryMonth: '12',
         expiryYear: '2030'
       },
       {
         brand: 'visa',
-        number: '4716059500917729',
+        number: '4716059500917728',
         cvv: '321',
         expiryMonth: '11',
         expiryYear: '2050'
