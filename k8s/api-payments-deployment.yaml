@@ -92,6 +92,11 @@ spec:
                 secretKeyRef:
                   name: api-payments-secrets
                   key: queue-unauthorized-payment
+            - name: AWS_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: api-payments-secrets
+                  key: aws-region
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
