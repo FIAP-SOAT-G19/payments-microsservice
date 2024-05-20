@@ -138,7 +138,7 @@ stringData:
   secret-key: e6cd5db8d02df52e23eb590e59d43cdc
   aws-region: us-east-1
   encrypt-key: $2a$12$N8KpRrrBKBkFo3jYez.KTOA7nTvlwyuM0sVlzPVdCMhRQzdG0NYFi
-  card-encryptor-microsservice-url: https://a266734233740437db7d75cf3aa1c409-831495522.us-east-1.elb.amazonaws.com:30002
+  card-encryptor-microsservice-url: https://a266734233740437db7d75cf3aa1c409-831495522.us-east-1.elb.amazonaws.com:30002/api/v1
   created-order-queue-name: https://sqs.us-east-1.amazonaws.com/471112746092/created_order.fifo
   queue-approved-payment: https://sqs.us-east-1.amazonaws.com/471112746092/approved_payment.fifo
   queue-unauthorized-payment: https://sqs.us-east-1.amazonaws.com/471112746092/unauthorized_payment.fifo
