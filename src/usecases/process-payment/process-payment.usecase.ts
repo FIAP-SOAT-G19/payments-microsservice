@@ -38,6 +38,7 @@ export class ProcessPaymentUseCase implements ProcessPaymentUseCaseInterface {
       logger.error(`Error get cardData\n ${error}`)
       throw error
     }
+    console.log(cardEncrypted)
 
     let cardDecrypted = null
 
