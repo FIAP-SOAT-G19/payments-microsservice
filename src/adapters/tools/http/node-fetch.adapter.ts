@@ -18,13 +18,13 @@ export class NodeFetchAdapter implements HttpRequest {
 
   async get (url: string, headers: any): Promise<any> {
     try {
-      console.log(url, headers)
       const response = await fetch(url, {
         method: 'GET',
         headers
-      }).then(response => response.json())
+      })
+      console.log(response)
 
-      return response
+      return response.json()
     } catch (error) {
       console.log(error)
       throw error
