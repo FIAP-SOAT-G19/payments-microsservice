@@ -86,11 +86,8 @@ export class ProcessPaymentGateway implements ProcessPaymentGatewayInterface {
       secretkey: process.env.SECRET_KEY
     }
 
-    const response = await http.get(url, headers).then(function(response) {
-      console.log(response)
-      return JSON.parse(response)
-    })
-    return response
+    const response = await http.get(url, headers)
+    return response.encryptedCard
   }
 
   async deleteCardData (cardId: string): Promise<void> {
