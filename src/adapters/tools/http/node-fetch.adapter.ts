@@ -18,23 +18,12 @@ export class NodeFetchAdapter implements HttpRequest {
 
   async get (url: string, headers: any): Promise<any> {
     try {
-      let responseClone: any
       const response = await fetch(url, {
         method: 'GET',
         headers
-      }).then(function (response) {
-        responseClone = response.clone()
-        return response.json()
-      }).then(function (data) {
-        console.log(data)
-      }, function (rejectionReason) { // 3
-        console.log('Error parsing JSON from response:', rejectionReason, responseClone); // 4
-        responseClone.text() // 5
-      .then(function (bodyText: any) {
-        console.log('Received the following instead of valid JSON:', bodyText); // 6
-      });
-    });
+      })
 
+      return response.json()
     } catch (error) {
       console.log(error)
       throw error
