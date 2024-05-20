@@ -77,7 +77,7 @@ spec:
                 secretKeyRef:
                   name: api-payments-secrets
                   key: secret-key
-            - name: CREATED_ORDER_QUEUE_NAME
+            - name: QUEUE_CREATED_ORDER
               valueFrom:
                 secretKeyRef:
                   name: api-payments-secrets
