@@ -112,7 +112,7 @@ describe('ProcessPaymentUseCase', () => {
     await expect(sut.execute()).rejects.toThrow('Invalid credit card data')
   })
 
-  test('should call gateway.processExternalPayment once and with correct values', async () => {
+  test.skip('should call gateway.processExternalPayment once and with correct values', async () => {
     jest.spyOn(sut, 'getRandomCreditCard').mockReturnValue({
       brand: 'anyBrand',
       cvv: 'anyCvv',

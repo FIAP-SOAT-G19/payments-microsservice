@@ -20,7 +20,7 @@ export class ProcessPaymentUseCase implements ProcessPaymentUseCaseInterface {
     for await (const payment of payments) {
       await this.gateway.updatePaymentStatus(payment.payment.id, constants.PAYMENT_STATUS.PROCESSING)
 
-      const creditCard = this.getRandomCreditCard()
+      const creditCard = await this.handleCard(payment.payment.cardId)
       const response = await this.gateway.processExternalPayment(creditCard, payment.payment.totalValue)
 
       await this.handleResponse(response, payment)
