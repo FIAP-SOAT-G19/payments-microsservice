@@ -103,6 +103,10 @@ export class ProcessPaymentGateway implements ProcessPaymentGatewayInterface {
     await http.delete(url, headers)
   }
 
+  async deletePaymentProductById (paymentId: string): Promise<void> {
+    await prismaClient.paymentProducts.delete({ where: { id: paymentId } })
+  }
+
   async processExternalPayment (creditCard: CreditCard, totalValue: number): Promise<ProcessPaymentOutput> {
     const isEvenNumber = (+creditCard.number.slice(-1)) % 2 === 0
 

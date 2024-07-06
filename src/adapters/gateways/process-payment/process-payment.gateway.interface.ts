@@ -55,4 +55,5 @@ export interface ProcessPaymentGatewayInterface {
   processExternalPayment: (creditCard: CreditCard, totalValue: number) => Promise<ProcessPaymentOutput>
   sendMessageQueue: (queueName: string, body: string, messageGroupId: string, messageDeduplicationId: string) => Promise<boolean>
   createPublishedMessageLog: (input: CreatePublishedMessageLog) => Promise<void>
+  deletePaymentProductById: (paymentId: string) => Promise<void>
 }

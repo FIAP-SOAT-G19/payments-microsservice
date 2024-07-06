@@ -8,7 +8,7 @@ import MockDate from 'mockdate'
 const gateway = mock<ProcessPaymentGatewayInterface>()
 const crypto = mock<CrypotInterface>()
 
-process.env.QUEUE_APROVED_PAYMENT = 'https://sqs.us-east-1.amazonaws.com/975049990702/approved_payment.fifo'
+process.env.QUEUE_APPROVED_PAYMENT = 'https://sqs.us-east-1.amazonaws.com/975049990702/approved_payment.fifo'
 process.env.QUEUE_UNAUTHORIZED_PAYMENT = 'https://sqs.us-east-1.amazonaws.com/975049990702/unauthorized_payment.fifo'
 
 describe('ProcessPaymentUseCase', () => {
