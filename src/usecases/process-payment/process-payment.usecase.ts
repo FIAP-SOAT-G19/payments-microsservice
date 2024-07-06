@@ -3,6 +3,7 @@ import { CrypotInterface } from '@/adapters/tools/crypto/crypto.adapter.interfac
 import constants from '@/shared/constants'
 import { logger } from '@/shared/helpers/logger.helper'
 import { ProcessPaymentOutput, ProcessPaymentUseCaseInterface } from './process-payment.usecase.interface'
+import { CardDecryptionError } from '@/shared/errors'
 
 export class ProcessPaymentUseCase implements ProcessPaymentUseCaseInterface {
   constructor(
@@ -20,10 +21,16 @@ export class ProcessPaymentUseCase implements ProcessPaymentUseCaseInterface {
     for await (const payment of payments) {
       await this.gateway.updatePaymentStatus(payment.payment.id, constants.PAYMENT_STATUS.PROCESSING)
 
-      const creditCard = await this.handleCard(payment.payment.cardId)
-      const response = await this.gateway.processExternalPayment(creditCard, payment.payment.totalValue)
-
-      await this.handleResponse(response, payment)
+      try {
+        const creditCard = await this.handleCard(payment.payment.cardId)
+        const response = await this.gateway.processExternalPayment(creditCard, payment.payment.totalValue)
+        await this.handleResponse(response, payment)
+      } catch (error) {
+        if (error instanceof CardDecryptionError) {
+          await this.handleResponse({ status: 'refused' }, payment)
+        }
+        throw error
+      }
     }
   }
 
@@ -36,7 +43,7 @@ export class ProcessPaymentUseCase implements ProcessPaymentUseCaseInterface {
       cardEncrypted = await this.gateway.getCardData(cardId)
     } catch (error) {
       logger.error(`Error get cardData\n ${error}`)
-      throw error
+      throw new CardDecryptionError()
     }
 
     let cardDecrypted = null
@@ -45,12 +52,12 @@ export class ProcessPaymentUseCase implements ProcessPaymentUseCaseInterface {
       cardDecrypted = this.crypto.decrypt(cardEncrypted)
     } catch (error) {
       logger.error(`Error when decrypt cardData\n ${error}`)
-      throw error
+      throw new CardDecryptionError()
     }
 
     if (!cardDecrypted) {
       logger.error('Error when decrypt cardData')
-      throw new Error('Invalid credit card data')
+      throw new CardDecryptionError()
     }
 
     return cardDecrypted

@@ -183,6 +183,23 @@ describe('ProcessPaymentUseCase', () => {
     )
   })
 
+  test('should call gateway.sendMessageQueue with refused status when handle card throws error', async () => {
+    gateway.getCardData.mockRejectedValue(new Error('Error'))
+
+    await expect(sut.execute()).rejects.toThrow('Card decryption error')
+
+    expect(gateway.sendMessageQueue).toHaveBeenCalledTimes(1)
+    expect(gateway.sendMessageQueue).toHaveBeenCalledWith(
+      'https://sqs.us-east-1.amazonaws.com/975049990702/unauthorized_payment.fifo',
+      JSON.stringify({
+        status: 'canceled',
+        orderNumber: 'anyOrderNumber'
+      }),
+      'processed_payment',
+      'anyOrderNumber'
+    )
+  })
+
   test('should call gateway.updatePaymentStatus with correct status', async () => {
     await sut.execute()
 
