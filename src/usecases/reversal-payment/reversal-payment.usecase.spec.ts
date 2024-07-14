@@ -64,38 +64,6 @@ describe('ReversalPaymentUseCase', () => {
     expect(gateway.updatePaymentStatus).toHaveBeenCalledWith('anyPaymentId', 'reversed')
   })
 
-  test('should call gateway.getCardData once and with correct cardId', async () => {
-    await sut.execute('anyOrderNumber')
-
-    expect(gateway.getCardData).toHaveBeenCalledTimes(1)
-    expect(gateway.getCardData).toHaveBeenCalledWith('anyCardId')
-  })
-
-  test('should throw if gateway.getCardData throws', async () => {
-    gateway.getCardData.mockRejectedValueOnce(new Error('Error get cardData'))
-
-    await expect(sut.execute('anyOrderNumber')).rejects.toThrow(CardDecryptionError)
-  })
-
-  test('should call crypto.decrypt once and with correct value', async () => {
-    await sut.execute('anyOrderNumber')
-
-    expect(crypto.decrypt).toHaveBeenCalledTimes(1)
-    expect(crypto.decrypt).toHaveBeenCalledWith('anyCardData')
-  })
-
-  test('should throw if crypto.decrypt throws', async () => {
-    crypto.decrypt.mockImplementationOnce(() => { throw new Error('Error decrypt cardData') })
-
-    await expect(sut.execute('anyOrderNumber')).rejects.toThrow(CardDecryptionError)
-  })
-
-  test('should throw if crypto.decrypt return null', async () => {
-    crypto.decrypt.mockReturnValueOnce(null)
-
-    await expect(sut.execute('anyOrderNumber')).rejects.toThrow(CardDecryptionError)
-  })
-
   test('should call gateway.processExternalPayment once and with correct values', async () => {
     jest.spyOn(sut, 'getRandomCreditCard').mockReturnValue({
       brand: 'anyBrand',
@@ -115,12 +83,5 @@ describe('ReversalPaymentUseCase', () => {
       expiryMonth: 'anyExpiryMonth',
       expiryYear: 'anyExpiryYear'
     }, 3000)
-  })
-
-  test('should call gateway.deleteCardData once and with correct cardId', async () => {
-    await sut.execute('anyOrderNumber')
-
-    expect(gateway.deleteCardData).toHaveBeenCalledTimes(1)
-    expect(gateway.deleteCardData).toHaveBeenCalledWith('anyCardId')
   })
 })
