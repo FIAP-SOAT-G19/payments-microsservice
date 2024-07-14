@@ -3,7 +3,8 @@ export default {
     APPROVED: 'approved',
     PROCESSING: 'processing',
     REFUSED: 'refused',
-    WAITING: 'waiting'
+    WAITING: 'waiting',
+    REVERSED: 'reversed'
   },
   MESSAGE_GROUP_ID: 'processed_payment',
   CARD_ENCRYPTOR_MICROSSERVICE: {

@@ -1,6 +1,7 @@
 import { ProcessPaymentUseCase } from './process-payment.usecase'
 import { ProcessPaymentGatewayInterface } from '@/adapters/gateways/process-payment/process-payment.gateway.interface'
 import { CrypotInterface } from '@/adapters/tools/crypto/crypto.adapter.interface'
+import { CardDecryptionError } from '@/shared/errors'
 import { logger } from '@/shared/helpers/logger.helper'
 import { mock } from 'jest-mock-extended'
 import MockDate from 'mockdate'
@@ -80,39 +81,39 @@ describe('ProcessPaymentUseCase', () => {
     expect(gateway.updatePaymentStatus).toHaveBeenCalledWith('anyPaymentId', 'processing')
   })
 
-  test.skip('should call gateway.getCardData once and with correct cardId', async () => {
+  test('should call gateway.getCardData once and with correct cardId', async () => {
     await sut.execute()
 
     expect(gateway.getCardData).toHaveBeenCalledTimes(1)
     expect(gateway.getCardData).toHaveBeenCalledWith('anyCardId')
   })
 
-  test.skip('should throw if gateway.getCardData throws', async () => {
+  test('should throw if gateway.getCardData throws', async () => {
     gateway.getCardData.mockRejectedValueOnce(new Error('Error get cardData'))
 
-    await expect(sut.execute()).rejects.toThrow('Error get cardData')
+    await expect(sut.execute()).rejects.toThrow(CardDecryptionError)
   })
 
-  test.skip('should call crypto.decrypt once and with correct value', async () => {
+  test('should call crypto.decrypt once and with correct value', async () => {
     await sut.execute()
 
     expect(crypto.decrypt).toHaveBeenCalledTimes(1)
     expect(crypto.decrypt).toHaveBeenCalledWith('anyCardData')
   })
 
-  test.skip('should throw if crypto.decrypt throws', async () => {
+  test('should throw if crypto.decrypt throws', async () => {
     crypto.decrypt.mockImplementationOnce(() => { throw new Error('Error decrypt cardData') })
 
-    await expect(sut.execute()).rejects.toThrow('Error decrypt cardData')
+    await expect(sut.execute()).rejects.toThrow(CardDecryptionError)
   })
 
-  test.skip('should throw if crypto.decrypt return null', async () => {
+  test('should throw if crypto.decrypt return null', async () => {
     crypto.decrypt.mockReturnValueOnce(null)
 
-    await expect(sut.execute()).rejects.toThrow('Invalid credit card data')
+    await expect(sut.execute()).rejects.toThrow(CardDecryptionError)
   })
 
-  test.skip('should call gateway.processExternalPayment once and with correct values', async () => {
+  test('should call gateway.processExternalPayment once and with correct values', async () => {
     jest.spyOn(sut, 'getRandomCreditCard').mockReturnValue({
       brand: 'anyBrand',
       cvv: 'anyCvv',
