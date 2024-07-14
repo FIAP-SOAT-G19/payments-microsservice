@@ -25,30 +25,7 @@ export class ReversalPaymentUseCase implements ReversalPaymentUseCaseInterface {
 
   async handleCard (cardId: string): Promise<CreditCard> {
     logger.info(`Send request to card_encryptor microsservice\n cardId: ${cardId} [GET]`)
-
-    let cardEncrypted = null
-
-    try {
-      cardEncrypted = await this.gateway.getCardData(cardId)
-    } catch (error) {
-      logger.error(`Error get cardData\n ${error}`)
-      throw new CardDecryptionError()
-    }
-
-    let cardDecrypted = null
-
-    try {
-      cardDecrypted = this.crypto.decrypt(cardEncrypted)
-    } catch (error) {
-      logger.error(`Error when decrypt cardData\n ${error}`)
-      throw new CardDecryptionError()
-    }
-
-    if (!cardDecrypted) {
-      logger.error('Error when decrypt cardData')
-      throw new CardDecryptionError()
-    }
-
+    const cardDecrypted = this.getRandomCreditCard()
     return cardDecrypted
   }
 
