@@ -4,16 +4,19 @@ import { CreatePaymentClientGatewayInterface } from '@/adapters/gateways/create-
 import { CrypotInterface } from '@/adapters/tools/crypto/crypto.adapter.interface'
 import { mock } from 'jest-mock-extended'
 import MockDate from 'mockdate'
+import { ProcessPaymentGatewayInterface } from '@/adapters/gateways/process-payment/process-payment.gateway.interface'
+import { logger } from '@/shared/helpers/logger.helper'
 
 const gateway = mock<CreatePaymentClientGatewayInterface>()
 const crypto = mock<CrypotInterface>()
+const processPaymentGateway = mock<ProcessPaymentGatewayInterface>()
 
 describe('CreatePaymentClientUseCase', () => {
   let sut: CreatePaymentClientUseCase
   let input: any
 
   beforeEach(() => {
-    sut = new CreatePaymentClientUseCase(gateway, crypto)
+    sut = new CreatePaymentClientUseCase(gateway, crypto, processPaymentGateway)
     input = {
       paymentId: 'anyPaymentId',
       identifier: 'anyIdentifier',
@@ -25,7 +28,7 @@ describe('CreatePaymentClientUseCase', () => {
     }
 
     gateway.getPaymentById.mockResolvedValue({
-      id: 'AnyId',
+      id: 'anyPaymentId',
       orderNumber: 'anyOrderNumber',
       totalValue: 5000,
       cardId: 'anyCardId',
@@ -38,6 +41,7 @@ describe('CreatePaymentClientUseCase', () => {
 
   beforeAll(() => {
     MockDate.set(new Date())
+    jest.spyOn(logger, 'info').mockImplementation(() => {})
   })
 
   afterAll(() => {
@@ -85,5 +89,45 @@ describe('CreatePaymentClientUseCase', () => {
       createdAt: new Date(),
       updatedAt: new Date()
     })
+  })
+
+  test('should set payment to refused, delete payment product, call handleError and send a canceled status to order queue', async () => {
+    process.env.QUEUE_UPDATE_ORDER_FIFO = 'https://sqs.us-east-1.amazonaws.com/975049990702/update_order.fifo'
+    gateway.createPaymentClient.mockRejectedValue(new Error('Error'))
+    jest.spyOn(processPaymentGateway, 'sendMessageQueue').mockResolvedValue(true)
+
+    await expect(sut.execute(input)).rejects.toThrow('Error creating payment client - order was canceled')
+
+    expect(gateway.createPaymentClient).toHaveBeenCalledTimes(1)
+    expect(processPaymentGateway.updatePaymentStatus).toHaveBeenCalledTimes(1)
+    expect(processPaymentGateway.updatePaymentStatus).toHaveBeenCalledWith('anyPaymentId', 'refused')
+    expect(processPaymentGateway.deletePaymentProductById).toHaveBeenCalledTimes(1)
+    expect(processPaymentGateway.deletePaymentProductById).toHaveBeenCalledWith('anyPaymentId')
+    expect(processPaymentGateway.sendMessageQueue).toHaveBeenCalledTimes(1)
+    expect(processPaymentGateway.sendMessageQueue).toHaveBeenCalledWith(
+      'https://sqs.us-east-1.amazonaws.com/975049990702/update_order.fifo',
+      '{"status":"canceled","orderNumber":"anyOrderNumber"}',
+      'processed_payment',
+      'anyOrderNumber')
+  })
+
+  test('should set payment to refused, delete payment product, call handleError nd throw error if sendMessageQueue return false', async () => {
+    process.env.QUEUE_UPDATE_ORDER_FIFO = 'https://sqs.us-east-1.amazonaws.com/975049990702/update_order.fifo'
+    gateway.createPaymentClient.mockRejectedValue(new Error('Error'))
+    jest.spyOn(processPaymentGateway, 'sendMessageQueue').mockResolvedValue(false)
+
+    await expect(sut.execute(input)).rejects.toThrow('Error sending message queue')
+
+    expect(gateway.createPaymentClient).toHaveBeenCalledTimes(1)
+    expect(processPaymentGateway.updatePaymentStatus).toHaveBeenCalledTimes(1)
+    expect(processPaymentGateway.updatePaymentStatus).toHaveBeenCalledWith('anyPaymentId', 'refused')
+    expect(processPaymentGateway.deletePaymentProductById).toHaveBeenCalledTimes(1)
+    expect(processPaymentGateway.deletePaymentProductById).toHaveBeenCalledWith('anyPaymentId')
+    expect(processPaymentGateway.sendMessageQueue).toHaveBeenCalledTimes(1)
+    expect(processPaymentGateway.sendMessageQueue).toHaveBeenCalledWith(
+      'https://sqs.us-east-1.amazonaws.com/975049990702/update_order.fifo',
+      '{"status":"canceled","orderNumber":"anyOrderNumber"}',
+      'processed_payment',
+      'anyOrderNumber')
   })
 })

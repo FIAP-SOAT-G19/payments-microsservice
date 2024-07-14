@@ -8,6 +8,7 @@ import { CreatePaymentProductUseCase } from '@/usecases/create-payment-product/c
 import { CreatePaymentProductInput } from '@/usecases/create-payment-product/create-payment-product.usecase.interface'
 import { CreatePaymentUseCase } from '@/usecases/create-payment/create-payment.usecase'
 import constants from '@/shared/constants'
+import { ProcessPaymentGateway } from '@/adapters/gateways/process-payment/process-payment.gateway'
 
 export class CreatedOrderHandler {
   async execute (message: any): Promise<void> {
@@ -26,7 +27,8 @@ export class CreatedOrderHandler {
 
   async createPayment (orderNumber: string, totalValue: number, cardId: string): Promise<string> {
     const createPaymentGateway = new CreatePaymentGateway()
-    const createPaymentUseCase = new CreatePaymentUseCase(createPaymentGateway)
+    const processPaymentGateway = new ProcessPaymentGateway()
+    const createPaymentUseCase = new CreatePaymentUseCase(createPaymentGateway, processPaymentGateway)
     const paymentId = await createPaymentUseCase.execute({ orderNumber, status: constants.PAYMENT_STATUS.WAITING, totalValue, cardId })
     return paymentId
   }
@@ -34,7 +36,8 @@ export class CreatedOrderHandler {
   async createPaymentProducts (paymentId: string, product: CreatePaymentProductInput): Promise<void> {
     const createPaymentProductGateway = new CreatePaymentProductGateway()
     const crypto = new CryptoAdapter()
-    const createPaymentProductUseCase = new CreatePaymentProductUseCase(createPaymentProductGateway, crypto)
+    const processPaymentGateway = new ProcessPaymentGateway()
+    const createPaymentProductUseCase = new CreatePaymentProductUseCase(createPaymentProductGateway, crypto, processPaymentGateway)
     await createPaymentProductUseCase.execute({
       paymentId,
       name: product.name,
@@ -50,7 +53,8 @@ export class CreatedOrderHandler {
   async createPaymentClient (paymentId: string, client: CreatePaymentClientInput): Promise<void> {
     const createPaymentClientGateway = new CreatePaymentClientGateway()
     const crypto = new CryptoAdapter()
-    const createPaymentClientUseCase = new CreatePaymentClientUseCase(createPaymentClientGateway, crypto)
+    const processPaymentGateway = new ProcessPaymentGateway()
+    const createPaymentClientUseCase = new CreatePaymentClientUseCase(createPaymentClientGateway, crypto, processPaymentGateway)
     await createPaymentClientUseCase.execute({
       identifier: client.identifier,
       name: client.name,

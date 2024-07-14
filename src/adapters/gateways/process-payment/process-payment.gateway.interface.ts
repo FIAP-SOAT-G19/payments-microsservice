@@ -1,4 +1,5 @@
 import { ProcessPaymentOutput } from '@/usecases/process-payment/process-payment.usecase.interface'
+import { ReversalPaymentOutput } from '@/usecases/reversal-payment/reversal-payment.usecase.interface'
 
 export type PaymentOutput = {
   payment: PaymentModel
@@ -49,10 +50,13 @@ export type CreatePublishedMessageLog = {
 
 export interface ProcessPaymentGatewayInterface {
   getPaymentByStatus: (status: string) => Promise<PaymentOutput [] | null>
+  getPaymentByOrderNumber: (orderNumber: string) => Promise<PaymentModel | null>
   updatePaymentStatus: (id: string, status: string) => Promise<void>
   getCardData: (cardId: string) => Promise<string>
   deleteCardData: (cardId: string) => Promise<void>
   processExternalPayment: (creditCard: CreditCard, totalValue: number) => Promise<ProcessPaymentOutput>
+  processExternalReversalPayment: (creditCard: CreditCard, totalValue: number) => Promise<ReversalPaymentOutput>
   sendMessageQueue: (queueName: string, body: string, messageGroupId: string, messageDeduplicationId: string) => Promise<boolean>
   createPublishedMessageLog: (input: CreatePublishedMessageLog) => Promise<void>
+  deletePaymentProductById: (paymentId: string) => Promise<void>
 }

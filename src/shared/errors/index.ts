@@ -27,3 +27,10 @@ export class PaymentNotFoundError extends Error {
     this.name = 'NotFoundError'
   }
 }
+
+export class CardDecryptionError extends Error {
+  constructor() {
+    super('Card decryption error')
+    this.name = 'CardDecryptionError'
+  }
+}

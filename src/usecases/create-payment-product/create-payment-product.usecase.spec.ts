@@ -4,9 +4,12 @@ import { CreatePaymentProductGatewayInterface } from '@/adapters/gateways/create
 import { CrypotInterface } from '@/adapters/tools/crypto/crypto.adapter.interface'
 import { mock } from 'jest-mock-extended'
 import MockDate from 'mockdate'
+import { ProcessPaymentGatewayInterface } from '@/adapters/gateways/process-payment/process-payment.gateway.interface'
+import { logger } from '@/shared/helpers/logger.helper'
 
 const gateway = mock<CreatePaymentProductGatewayInterface>()
 const crypto = mock<CrypotInterface>()
+const processPaymentGateway = mock<ProcessPaymentGatewayInterface>()
 
 describe('CreatePaymentProductUseCase', () => {
   let sut: CreatePaymentProductUseCase
@@ -14,6 +17,7 @@ describe('CreatePaymentProductUseCase', () => {
 
   beforeAll(() => {
     MockDate.set(new Date())
+    jest.spyOn(logger, 'info').mockImplementation(() => {})
   })
 
   afterAll(() => {
@@ -22,7 +26,7 @@ describe('CreatePaymentProductUseCase', () => {
   })
 
   beforeEach(() => {
-    sut = new CreatePaymentProductUseCase(gateway, crypto)
+    sut = new CreatePaymentProductUseCase(gateway, crypto, processPaymentGateway)
     input = {
       paymentId: 'anyPaymentId',
       name: 'anyName',
@@ -34,7 +38,7 @@ describe('CreatePaymentProductUseCase', () => {
     }
 
     gateway.getPaymentById.mockResolvedValue({
-      id: 'AnyId',
+      id: 'anyPaymentId',
       orderNumber: 'anyOrderNumber',
       totalValue: 5000,
       cardId: 'anyCardId',
@@ -92,5 +96,41 @@ describe('CreatePaymentProductUseCase', () => {
       createdAt: new Date(),
       updatedAt: new Date()
     })
+  })
+
+  test('should set payment to refused, call handleError and send a canceled status to order queue', async () => {
+    process.env.QUEUE_UPDATE_ORDER_FIFO = 'https://sqs.us-east-1.amazonaws.com/975049990702/update_order.fifo'
+    gateway.createPaymentProduct.mockRejectedValue(new Error('Error'))
+    jest.spyOn(processPaymentGateway, 'sendMessageQueue').mockResolvedValue(true)
+
+    await expect(sut.execute(input)).rejects.toThrow('Error creating payment products - order was canceled')
+
+    expect(gateway.createPaymentProduct).toHaveBeenCalledTimes(1)
+    expect(processPaymentGateway.updatePaymentStatus).toHaveBeenCalledTimes(1)
+    expect(processPaymentGateway.updatePaymentStatus).toHaveBeenCalledWith('anyPaymentId', 'refused')
+    expect(processPaymentGateway.sendMessageQueue).toHaveBeenCalledTimes(1)
+    expect(processPaymentGateway.sendMessageQueue).toHaveBeenCalledWith(
+      'https://sqs.us-east-1.amazonaws.com/975049990702/update_order.fifo',
+      '{"status":"canceled","orderNumber":"anyOrderNumber"}',
+      'processed_payment',
+      'anyOrderNumber')
+  })
+
+  test('should set payment to refused, call handleError and throw error if sendMessageQueue return false', async () => {
+    process.env.QUEUE_UPDATE_ORDER_FIFO = 'https://sqs.us-east-1.amazonaws.com/975049990702/update_order.fifo'
+    gateway.createPaymentProduct.mockRejectedValue(new Error('Error'))
+    jest.spyOn(processPaymentGateway, 'sendMessageQueue').mockResolvedValue(false)
+
+    await expect(sut.execute(input)).rejects.toThrow('Error sending message queue')
+
+    expect(gateway.createPaymentProduct).toHaveBeenCalledTimes(1)
+    expect(processPaymentGateway.updatePaymentStatus).toHaveBeenCalledTimes(1)
+    expect(processPaymentGateway.updatePaymentStatus).toHaveBeenCalledWith('anyPaymentId', 'refused')
+    expect(processPaymentGateway.sendMessageQueue).toHaveBeenCalledTimes(1)
+    expect(processPaymentGateway.sendMessageQueue).toHaveBeenCalledWith(
+      'https://sqs.us-east-1.amazonaws.com/975049990702/update_order.fifo',
+      '{"status":"canceled","orderNumber":"anyOrderNumber"}',
+      'processed_payment',
+      'anyOrderNumber')
   })
 })

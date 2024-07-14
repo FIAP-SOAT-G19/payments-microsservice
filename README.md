@@ -1,7 +1,9 @@
-# 💬 Payments Microservice
+# 💬 Tech Challenge - Payments Microservice
 
 ## ✳️ Sobre
 O **Tech Challenge** é um projeto de um sistema de autoatendimento de fast food, que é composto por uma série de dispositivos e interfaces que permitem aos clientes selecionar e fazer pedidos sem precisar interagir com um atendente.
+
+O **Microsserviço de Pagamentos** consome os pedidos dos clientes de uma fila e processa verificando os dados do cartão. Depois, ele envia para a fila que será consumida pelo microsserviço de Produção
 
 ---
 
@@ -45,7 +47,7 @@ Existe o arquivo `.env.example` com todas as variáveis utilizadas para rodar o 
 - Execute os seguintes comandos:
   ```bash
     kubectl apply -f k8s/db-deployment.yaml
-    kubectl apply -f k8s/api-deployment.yaml
+    kubectl apply -f k8s/api-payments-deployment.yaml
     kubectl apply -f k8s/metrics.yaml
   ```
 
@@ -59,10 +61,6 @@ Existe o arquivo `.env.example` com todas as variáveis utilizadas para rodar o 
 
 ---
 
-<!-- ## ▶️ Vídeo do Projeto
-Link do vídeo no [Youtube](https://youtu.be/TDvxi906vco?si=yY3aulSxq2tg5fiC) -->
-
----
 
 ## 🚀 Commits no projeto
 

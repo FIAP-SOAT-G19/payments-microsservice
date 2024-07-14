@@ -1,9 +1,10 @@
 import { ProcessPaymentOutput } from '@/usecases/process-payment/process-payment.usecase.interface'
-import { CreatePublishedMessageLog, CreditCard, PaymentOutput, ProcessPaymentGatewayInterface } from './process-payment.gateway.interface'
+import { CreatePublishedMessageLog, CreditCard, PaymentModel, PaymentOutput, ProcessPaymentGatewayInterface } from './process-payment.gateway.interface'
 import { prismaClient } from '../prisma.client'
 import { AwsSqsAdapter } from '@/adapters/queue/aws-sqs.adapter'
 import { NodeFetchAdapter } from '@/adapters/tools/http/node-fetch.adapter'
 import constants from '@/shared/constants'
+import { ReversalPaymentOutput } from '@/usecases/reversal-payment/reversal-payment.usecase.interface'
 
 export class ProcessPaymentGateway implements ProcessPaymentGatewayInterface {
   async getPaymentByStatus (status: string): Promise<PaymentOutput[] | null> {
@@ -76,6 +77,24 @@ export class ProcessPaymentGateway implements ProcessPaymentGatewayInterface {
     await prismaClient.payment.update({ data: { status }, where: { id } })
   }
 
+  async getPaymentByOrderNumber (orderNumber: string): Promise<PaymentModel | null> {
+    const payment = await prismaClient.payment.findUnique({
+      where: {
+        orderNumber
+      }
+    })
+    if (!payment) return null
+
+    return {
+      id: payment.id,
+      orderNumber: payment.orderNumber,
+      totalValue: payment.totalValue,
+      status: payment.status,
+      reason: payment.reason ?? '',
+      cardId: payment.cardId
+    }
+  }
+
   async getCardData (cardId: string): Promise<string> {
     const http = new NodeFetchAdapter()
 
@@ -87,7 +106,7 @@ export class ProcessPaymentGateway implements ProcessPaymentGatewayInterface {
     }
 
     const response = await http.get(url, headers)
-    return response
+    return response.encryptedCard
   }
 
   async deleteCardData (cardId: string): Promise<void> {
@@ -103,6 +122,10 @@ export class ProcessPaymentGateway implements ProcessPaymentGatewayInterface {
     await http.delete(url, headers)
   }
 
+  async deletePaymentProductById (paymentId: string): Promise<void> {
+    await prismaClient.paymentProducts.delete({ where: { id: paymentId } })
+  }
+
   async processExternalPayment (creditCard: CreditCard, totalValue: number): Promise<ProcessPaymentOutput> {
     const isEvenNumber = (+creditCard.number.slice(-1)) % 2 === 0
 
@@ -110,6 +133,12 @@ export class ProcessPaymentGateway implements ProcessPaymentGatewayInterface {
     const reason = isEvenNumber ? undefined : this.getRandomMessage()
 
     return { status, reason }
+  }
+
+  async processExternalReversalPayment (creditCard: CreditCard, totalValue: number): Promise<ReversalPaymentOutput> {
+    const status = 'reversed'
+
+    return { status, totalValue }
   }
 
   getRandomMessage(): string {

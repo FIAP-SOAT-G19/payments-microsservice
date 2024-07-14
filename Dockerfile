@@ -7,12 +7,12 @@ COPY package*.json ./
 RUN npm install --no-optional
 
 RUN apt-get update && \
-    apt-get install -y awscli
+  apt-get install -y awscli
 
 COPY . .
 
 RUN npm run build
 
-EXPOSE 3002
+EXPOSE 3006
 
 CMD [ "npm", "start" ]
