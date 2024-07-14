@@ -152,6 +152,8 @@ stringData:
   created-order-queue-name: https://sqs.us-east-1.amazonaws.com/471112746092/created_order.fifo
   queue-approved-payment: https://sqs.us-east-1.amazonaws.com/471112746092/approved_payment.fifo
   queue-unauthorized-payment: https://sqs.us-east-1.amazonaws.com/471112746092/unauthorized_payment.fifo
+  update-order-queue: https://sqs.us-east-1.amazonaws.com/471112746092/update_order.fifo
+  cancel-order-queue: https://sqs.us-east-1.amazonaws.com/471112746092/cancel_order.fifo
 
 ---
 apiVersion: v1
