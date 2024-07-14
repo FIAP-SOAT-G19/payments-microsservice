@@ -20,6 +20,7 @@ export class ReversalPaymentUseCase implements ReversalPaymentUseCaseInterface {
 
     const creditCard = await this.handleCard(payment.cardId)
     const response = await this.gateway.processExternalReversalPayment(creditCard, payment.totalValue)
+    logger.info(`Request for refund was made`)
     await this.handleResponse(response, payment)
   }
 
