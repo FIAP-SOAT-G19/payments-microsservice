@@ -92,6 +92,16 @@ spec:
                 secretKeyRef:
                   name: api-payments-secrets
                   key: queue-unauthorized-payment
+            - name: UPDATE_ORDER_QUEUE
+              valueFrom:
+                secretKeyRef:
+                  name: api-production-secrets
+                  key: update-order-queue
+            - name: CANCEL_ORDER_QUEUE
+              valueFrom:
+                secretKeyRef:
+                  name: api-production-secrets
+                  key: cancel-order-queue
             - name: AWS_REGION
               valueFrom:
                 secretKeyRef:
