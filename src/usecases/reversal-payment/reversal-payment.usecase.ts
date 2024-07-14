@@ -31,17 +31,9 @@ export class ReversalPaymentUseCase implements ReversalPaymentUseCaseInterface {
 
   async handleResponse (response: ProcessPaymentOutput, payment: PaymentModel): Promise<void> {
     const { status } = response
-    const { id, cardId } = payment
+    const { id } = payment
 
     await this.gateway.updatePaymentStatus(id, status)
-
-    try {
-      logger.info(`Send request to card_encryptor microsservice\n cardId: ${cardId} [DELETE]`)
-      await this.gateway.deleteCardData(cardId)
-    } catch (error) {
-      logger.error(`Error delete cardData\n ${error}`)
-      throw error
-    }
   }
 
   getRandomCreditCard(): CreditCard {
